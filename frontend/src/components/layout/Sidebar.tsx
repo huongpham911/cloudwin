@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useAuth } from '../../contexts/AuthContext'
 import Logo from '../ui/Logo'
+import Avatar from '../common/Avatar'
 import {
   HomeIcon,
   PlusCircleIcon,
@@ -236,19 +237,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed }) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center min-w-0 flex-1">
               <div className="flex-shrink-0">
-                {user?.avatar_url ? (
-                  <img
-                    className="h-8 w-8 rounded-full"
-                    src={user.avatar_url}
-                    alt={user.full_name || user.display_name || user.username || 'User'}
-                  />
-                ) : (
-                  <div className="h-8 w-8 bg-blue-500 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-medium text-white">
-                      {user?.full_name?.charAt(0).toUpperCase() || user?.display_name?.charAt(0).toUpperCase() || user?.username?.charAt(0).toUpperCase() || 'U'}
-                    </span>
-                  </div>
-                )}
+                <Avatar
+                  user={user || {}}
+                  size="sm"
+                  showBorder={true}
+                />
               </div>
               <div className="ml-3 min-w-0 flex-1">
                 <p className="text-sm font-medium text-white truncate">{user?.full_name || user?.display_name || user?.username || 'User'}</p>
@@ -272,23 +265,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed }) => {
       {/* Collapsed Tooltip */}
       {isCollapsed && (
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
-          {user?.avatar_url ? (
-            <img
-              className="h-8 w-8 rounded-full"
-              src={user.avatar_url}
-              alt={user.full_name || user.display_name || user.username || 'User'}
-              title={user.full_name || user.display_name || user.username || 'User'}
-            />
-          ) : (
-            <div
-              className="h-8 w-8 bg-blue-500 rounded-full flex items-center justify-center"
-              title={user?.full_name || user?.display_name || user?.username || 'User'}
-            >
-              <span className="text-sm font-medium text-white">
-                {user?.full_name?.charAt(0).toUpperCase() || user?.display_name?.charAt(0).toUpperCase() || user?.username?.charAt(0).toUpperCase() || 'U'}
-              </span>
-            </div>
-          )}
+          <Avatar
+            user={user || {}}
+            size="sm"
+            showBorder={true}
+          />
         </div>
       )}
     </div>
