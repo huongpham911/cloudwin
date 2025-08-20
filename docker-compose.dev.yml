@@ -29,7 +29,7 @@ services:
     restart: always
     command: redis-server --appendonly yes --requirepass wincloud_dev_redis
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redis_dev_data:/data
     networks:
@@ -104,7 +104,7 @@ services:
 
   # Home/Landing Page (Vue.js)
   home:
-    build: 
+    build:
       context: ./home
       target: development
     restart: always
