@@ -61,7 +61,7 @@ services:
       ENVIRONMENT: development
 
       # CORS
-      CORS_ORIGINS: '["http://localhost:3000","http://localhost:5173","http://localhost:7000","http://127.0.0.1:5173","http://127.0.0.1:7000"]'
+      CORS_ORIGINS: '["http://localhost:3000","http://localhost:5173","http://localhost:7001","http://127.0.0.1:5173","http://127.0.0.1:7001"]'
 
       # DigitalOcean
       DO_SSH_KEY_ID: ${DO_SSH_KEY_ID:-}
@@ -109,7 +109,7 @@ services:
       target: development
     restart: always
     ports:
-      - "7000:7000"
+      - "7001:7000"
     environment:
       - NODE_ENV=development
       - VUE_APP_API_URL=http://localhost:5000
