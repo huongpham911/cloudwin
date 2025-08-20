@@ -337,7 +337,7 @@ else
     echo
     print_info "🛠️ Development Tools:"
     print_info "   Database UI: http://localhost:8080 (Adminer)"
-    print_info "   Redis UI: http://localhost:8081 (Redis Commander)"
+    print_info "   Redis UI: http://localhost:8082 (Redis Commander)"
     print_info "     - User: admin, Pass: wincloud_redis_ui"
 fi
 

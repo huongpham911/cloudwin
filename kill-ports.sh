@@ -5,7 +5,7 @@
 echo "🔍 Checking and killing processes on common ports..."
 
 # Ports to check
-PORTS=(5000 5173 7000 7001 5432 5433 6379 6380 8080 8081)
+PORTS=(5000 5173 7000 7001 5432 5433 6379 6380 8080 8081 8082)
 
 for port in "${PORTS[@]}"; do
     echo "Checking port $port..."
