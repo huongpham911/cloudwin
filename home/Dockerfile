@@ -15,6 +15,12 @@ RUN rm -f package-lock.json && npm install
 # Copy source code
 COPY . .
 
+# Expose port for development
+EXPOSE 7000
+
+# Development command
+CMD ["npm", "run", "dev"]
+
 # Build stage
 FROM node:20-alpine as build
 
