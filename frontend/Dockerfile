@@ -1,28 +1,36 @@
 # Multi-stage build for React frontend
 
-# Development stage
-FROM node:20-alpine as development
+# Base stage for dependencies
+FROM node:20-alpine as base
 WORKDIR /app
-COPY package*.json ./
-RUN rm -rf node_modules package-lock.json || true
-RUN npm cache clean --force || true
-RUN npm install
-COPY . .
-RUN npm run build
-EXPOSE 5173
-# Serve the built files instead of dev mode
-RUN npm install -g serve
-CMD ["serve", "-s", "dist", "-l", "5173"]
 
-# Build stage
-FROM node:20-alpine as build
-WORKDIR /app
+# Install build dependencies for Alpine
+RUN apk add --no-cache python3 make g++
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install --only=production
+# Clean install
+RUN rm -rf node_modules package-lock.json || true
+RUN npm cache clean --force
+RUN npm install --legacy-peer-deps
+
+# Development stage
+FROM base as development
+WORKDIR /app
+
+# Copy source code
+COPY . .
+
+# Expose port
+EXPOSE 5173
+
+# Start development server
+CMD ["npm", "run", "dev"]
+
+# Build stage
+FROM base as build
+WORKDIR /app
 
 # Copy source code
 COPY . .
@@ -39,15 +47,6 @@ ENV GENERATE_SOURCEMAP=false
 
 # Build the application
 RUN npm run build
-
-# Install serve for development
-RUN npm install -g serve
-
-# Development stage
-FROM build as development
-WORKDIR /app
-EXPOSE 5173
-CMD ["npm", "run", "dev"]
 
 # Production stage with Nginx
 FROM nginx:alpine as production
