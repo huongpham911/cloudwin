@@ -148,19 +148,29 @@ try:
         user_tokens = []
 
         try:
-            from app.services.enhanced_token_service import enhanced_token_service
+            # Try to load from simple tokens_secure.json format first
+            import json
+            import os
 
-            # Get all valid tokens from secure service
-            all_tokens = enhanced_token_service.get_all_valid_tokens()
-            user_tokens = all_tokens
+            tokens_file = "tokens_secure.json"
+            if os.path.exists(tokens_file):
+                with open(tokens_file, 'r') as f:
+                    data = json.load(f)
 
-            if all_tokens:
-                logger.info(f"✅ Loaded {len(all_tokens)} encrypted tokens from secure storage")
+                # Handle simple format
+                if 'tokens' in data:
+                    for token_data in data['tokens']:
+                        token = token_data.get('token', '')
+                        if token and token != 'YOUR_NEW_DIGITALOCEAN_TOKEN_HERE':
+                            user_tokens.append(token)
+                            logger.info(f"✅ Loaded token: {token[:20]}...")
+
+                logger.info(f"✅ Loaded {len(user_tokens)} tokens from simple format")
             else:
-                logger.warning("⚠️ No tokens found in secure storage")
+                logger.warning("⚠️ tokens_secure.json not found")
 
         except Exception as e:
-            logger.error(f"❌ Error loading secure tokens: {e}")
+            logger.error(f"❌ Error loading tokens: {e}")
             user_tokens = []
 
         # Create DO clients from secure tokens
@@ -185,16 +195,39 @@ try:
 
     do_clients = init_do_clients_secure()
     
-    # Initialize SpacesService with first available token
+    # Initialize SpacesService with first available token and credentials
     spaces_service = None
     genai_service = None
     direct_genai_service = None
     if do_clients:
         first_token = do_clients[0]['token']
-        spaces_service = get_spaces_service(token=first_token)
+
+        # Load Spaces credentials from tokens_secure.json
+        spaces_key = None
+        spaces_secret = None
+        try:
+            import json
+            import os
+            tokens_file = "tokens_secure.json"
+            if os.path.exists(tokens_file):
+                with open(tokens_file, 'r') as f:
+                    data = json.load(f)
+                    spaces_creds = data.get('spaces_credentials', {})
+                    spaces_key = spaces_creds.get('access_key')
+                    spaces_secret = spaces_creds.get('secret_key')
+
+                    if spaces_key and spaces_secret:
+                        logger.info(f"✅ Loaded Spaces credentials: {spaces_key[:10]}...")
+                    else:
+                        logger.warning("⚠️ Spaces credentials not found in tokens_secure.json")
+        except Exception as e:
+            logger.error(f"❌ Error loading Spaces credentials: {e}")
+
+        # Initialize services with credentials
+        spaces_service = get_spaces_service(token=first_token, spaces_key=spaces_key, spaces_secret=spaces_secret)
         genai_service = get_genai_service(token=first_token)
         direct_genai_service = get_direct_genai_service(token=first_token, model_access_key=MODEL_ACCESS_KEY)
-        logger.info("✅ SpacesService initialized with first token")
+        logger.info("✅ SpacesService initialized with first token and credentials")
         logger.info("✅ GenAI Service initialized with first token")
         logger.info("✅ Direct GenAI Service initialized with first token and Model Access Key")
     else:

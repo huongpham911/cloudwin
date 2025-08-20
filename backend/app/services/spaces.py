@@ -1692,10 +1692,10 @@ class SpacesService:
                 "bucket_name": bucket_name
             }
 
-# Factory function to create SpacesService with token
-def get_spaces_service(token=None):
-    """Get a SpacesService instance with the provided token"""
-    return SpacesService(token=token)
+# Factory function to create SpacesService with token and credentials
+def get_spaces_service(token=None, spaces_key=None, spaces_secret=None):
+    """Get a SpacesService instance with the provided token and Spaces credentials"""
+    return SpacesService(token=token, spaces_key=spaces_key, spaces_secret=spaces_secret)
 
 # Global instance - will be initialized later with proper token
 spaces_service = None
