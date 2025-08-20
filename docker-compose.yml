@@ -106,9 +106,9 @@ services:
     build: ./home
     restart: always
     ports:
-      - "7000:3000"
+      - "7000:80"
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - VUE_APP_API_URL=http://localhost:5000
     volumes:
       - ./home:/app

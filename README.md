@@ -73,7 +73,8 @@ cd wincloud-builder
 ```
 
 3. **Access applications**
-- 🌐 Frontend: http://localhost:5173
+- 🏠 Home/Landing Page: http://localhost:7000
+- 🌐 Frontend Dashboard: http://localhost:5173
 - 🔧 Backend API: http://localhost:5000
 - 📚 API Docs: http://localhost:5000/docs
 - 💾 Database: localhost:5432
