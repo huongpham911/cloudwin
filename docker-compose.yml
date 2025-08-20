@@ -1,0 +1,130 @@
+version: "3.8"
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: wincloud
+      POSTGRES_PASSWORD: wincloud123
+      POSTGRES_DB: wincloud
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=C.UTF-8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - wincloud_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wincloud -d wincloud"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Redis Cache & Session Store
+  redis:
+    image: redis:7-alpine
+    restart: always
+    command: redis-server --appendonly yes --requirepass wincloud_redis_password
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - wincloud_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      target: development
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      # Database
+      DATABASE_URL: postgresql://wincloud:wincloud123@db:5432/wincloud
+
+      # Redis
+      REDIS_URL: redis://:wincloud_redis_password@redis:6379/0
+
+      # Application
+      SECRET_KEY: your-secret-key-change-in-production
+      DEBUG: "true"
+      ENVIRONMENT: development
+
+      # CORS
+      CORS_ORIGINS: '["http://localhost:3000","http://localhost:5173","http://localhost:7000","https://panel.wincloud.app"]'
+
+      # DigitalOcean
+      DO_SSH_KEY_ID: ${DO_SSH_KEY_ID:-}
+
+      # Domains for development
+      API_DOMAIN: localhost:5000
+      PANEL_DOMAIN: localhost:5173
+
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - ./backend/tokens_secure.json:/app/tokens_secure.json:ro
+    networks:
+      - wincloud_network
+    command: python run_minimal_real_api.py
+
+  # Frontend Development Server
+  frontend:
+    build:
+      context: ./frontend
+      target: development
+    restart: always
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:5000
+      - VITE_ENVIRONMENT=development
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - wincloud_network
+
+  # Home/Landing Page (Vue.js)
+  home:
+    build: ./home
+    restart: always
+    ports:
+      - "7000:3000"
+    environment:
+      - NODE_ENV=development
+      - VUE_APP_API_URL=http://localhost:5000
+    volumes:
+      - ./home:/app
+      - /app/node_modules
+    networks:
+      - wincloud_network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  wincloud_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16

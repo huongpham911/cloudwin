@@ -1,0 +1,30 @@
+{
+  "backup_name": "wincloud_backup_20250819_030706",
+  "backup_date": "2025-08-19T03:07:13.472965",
+  "backup_size_mb": 0.9,
+  "included_components": [
+    "Backend (Python/FastAPI)",
+    "Frontend (React/Vue)",
+    "Home (Landing Page)",
+    "Configuration Files",
+    "Database Schema",
+    "Scripts & Tools",
+    "Documentation",
+    "Requirements Files",
+    "System Information"
+  ],
+  "excluded_items": [
+    "__pycache__",
+    "node_modules",
+    "venv",
+    "logs",
+    "dist/build",
+    "database files",
+    "temporary files"
+  ],
+  "git_info": {
+    "branch": "main",
+    "commit": "78a1c4777af3081907512bcc5bc69843ccbc8b44",
+    "status": "D .github/copilot-instructions.md\n D Test-data/scripts/cleanup_all.py\n D backend/accounts_service.py\n M backend/app/api/v1/admin.py\n M backend/app/api/v1/api.py\n M backend/app/api/v1/droplets.py\n M backend/app/api/v1/droplets_rbac.py\n M backend/app/api/v1/firewalls.py\n M backend/app/api/v1/images.py\n M backend/app/api/v1/public_resources.py\n M backend/app/api/v1/regions.py\n M backend/app/api/v1/settings_tokens.py\n M backend/app/api/v1/sizes.py\n M backend/app/api/v1/volumes.py\n M backend/app/core/config.py\n M backend/app/core/config_simple.py\n D backend/auth_server.py\n D backend/check_admin.py\n D backend/check_users.py\n D backend/create_admin.py\n D backend/migrate_auth_simple.py\n D backend/migrate_auth_system.py\n D backend/package-lock.json\n D backend/package.json\nMM backend/requirements.txt\n D backend/requirements.txt.backup\n M backend/requirements_minimal.txt\n M backend/run_minimal_real_api.py\n M backend/tokens.json\n D backend/ultra_simple_auth.py\n M backend/user_token_manager.py\nAD backend/wincloud_export.sql\nAD convert_sqlite_to_sql.py\n D cursor_ssh_config.txt\nMD docker-compose.dev.yml\n D docker-compose.nginx.yml\n D docker-compose.prod.yml\n D email_templates/forgot_password_template.html\n D email_templates/forgot_password_template.txt\n D env.docker.example\n M env.production\n M frontend/Dockerfile\n M frontend/index.html\n M frontend/package-lock.json\n M frontend/package.json\n M frontend/src/App.tsx\n M frontend/src/components/admin/AdminDashboard.tsx\n M frontend/src/components/admin/AdminLayout.tsx\n M frontend/src/components/admin/UserManagement.tsx\n M frontend/src/components/analytics/Analytics.tsx\n M frontend/src/components/dashboard/Analytics.tsx\n M frontend/src/components/dashboard/DashboardHome.tsx\n M frontend/src/components/droplets/DropletDetailTabs.tsx\n D frontend/src/components/droplets/DropletManagement.backup.tsx\n M frontend/src/components/droplets/DropletManagement.tsx\n M frontend/src/components/droplets/DropletsList.tsx\n M frontend/src/components/droplets/RealTimeTerminal.tsx\n M frontend/src/components/layout/Sidebar.tsx\n M frontend/src/components/settings/TokenManager.tsx\n M frontend/src/components/volumes/AttachVolumeModal.tsx\n M frontend/src/components/volumes/CreateVolumeModal.tsx\n M frontend/src/components/volumes/VolumeManager.tsx\n M frontend/src/contexts/AuthContext.tsx\n M frontend/src/contexts/ThemeContext.tsx\n M frontend/src/contexts/TokenSyncContext.tsx\n M frontend/src/hooks/usePermissions.ts\n M frontend/src/hooks/useTokens.ts\n M frontend/src/hooks/useWebSocket.ts\n M frontend/src/main.tsx\n M frontend/src/pages/CreateVPS.tsx\n M frontend/src/pages/CreateVPS_working_backup.tsx\n M frontend/src/pages/Dashboard.tsx\n M frontend/src/pages/Login.tsx\n M frontend/src/pages/auth/ForgotPassword.tsx\n M frontend/src/pages/auth/Login.tsx\n M frontend/src/pages/auth/Register.tsx\n M frontend/src/services/adminApi.ts\n M frontend/src/services/api.ts\n M frontend/src/services/droplets.ts\n M frontend/src/services/droplets_working_backup.ts\n M frontend/src/services/secureTokenService.ts\n M frontend/src/services/tokenService.ts\n M frontend/src/services/volumes.ts\n M frontend/src/utils/csrf.ts\n M frontend/src/utils/csrf_clean.ts\n M frontend/src/utils/csrf_new.ts\n M frontend/src/utils/sessionManager_new.ts\n D frontend/test_reload.txt\n M home/package.json\nAD import_sqlite_data.sh\nM  nginx/html/health/index.html\n D quick_upload.ps1\n D security-comparison.md\n D setup_cursor_remote.ps1\n D setup_ssh_complete.sh\n D setup_wincloud_vps.ps1\n D start_development.bat\n D start_wincloud_redis.bat\nAD test_backend_local.py\n D upload_commands.txt\n D upload_to_vps.ps1\n D user_token_manager.py\n D vps_setup_commands.sh\n?? USER_DATA_IMPLEMENTATION_SUMMARY.md\n?? backend/app/api/v1/api_backup.py\n?? backend/app/api/v1/api_clean.py\n?? backend/app/services/direct_genai_service.py\n?? backend/app/services/enhanced_token_service.py\n?? backend/app/services/genai_service.py\n?? backend/tokens_secure.json\n?? backend/wincloud_key\n?? backups/\n?? create_system_backup.py\n?? debug_genai_api.py\n?? docs/digitalocean-gradient-integration-plan.md\n?? frontend/FIXES_SUMMARY.md\n?? frontend/FRONTEND_FIXES.md\n?? frontend/public/kangta-logo.png\n?? frontend/public/kangta-logo.svg\n?? frontend/public/test-login.html\n?? frontend/src/components/ErrorBoundary.tsx\n?? frontend/src/components/admin/AdminAgents.tsx\n?? frontend/src/components/debug/\n?? frontend/src/components/ui/\n?? frontend/src/config/\n?? frontend/src/hooks/usePerformance.ts\n?? frontend/src/hooks/usePermissions.simple.ts\n?? frontend/src/pages/AIAgents.tsx\n?? frontend/src/pages/VolumesPage.tsx\n?? frontend/src/services/genaiService.ts\n?? frontend/src/services/userApi.ts\n?? frontend/src/services/userDataService.ts\n?? frontend/src/test-secure-token.ts\n?? frontend/src/utils/consoleSuppression.ts\n?? frontend/src/utils/logger.ts\n?? frontend/test-secure-token.html\n?? restore_system_backup.py\n?? test_ai_agent.py\n?? test_ai_agent_final.py\n?? test_direct_digitalocean.py\n?? test_direct_service.py\n?? test_direct_service_full.py\n?? test_genai_discovery.py\n?? test_model_access_key.py\n?? test_model_uuid.py\n?? test_pydo_vs_direct.py\n?? test_simple_agent.py\n?? test_uuid_agent.py"
+  }
+}

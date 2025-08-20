@@ -1,0 +1,150 @@
+#cloud-config
+# Cloud-init script for Windows Builder droplets
+
+# Update system packages
+package_update: true
+package_upgrade: true
+
+# Install required packages
+packages:
+  - qemu-kvm
+  - libvirt-daemon-system
+  - libvirt-clients
+  - bridge-utils
+  - virtio-win
+  - wget
+  - curl
+  - genisoimage
+  - python3
+  - python3-pip
+  - ufw
+  - htop
+  - screen
+
+# Create working directories
+runcmd:
+  # Enable KVM
+  - modprobe kvm
+  - modprobe kvm_intel || modprobe kvm_amd
+  
+  # Create build directory
+  - mkdir -p /root/winbuild
+  - mkdir -p /var/log/winbuilder
+  
+  # Configure firewall
+  - ufw allow 22/tcp
+  - ufw allow 3389/tcp
+  - ufw --force enable
+  
+  # Create build status file
+  - echo "READY" > /root/winbuild/status
+  
+  # Install webhook client
+  - |
+    cat > /usr/local/bin/winbuilder-webhook.py << 'EOF'
+    #!/usr/bin/env python3
+    import requests
+    import json
+    import sys
+    import os
+    
+    WEBHOOK_URL = os.getenv('WEBHOOK_URL', '')
+    BUILD_TOKEN = os.getenv('BUILD_TOKEN', '')
+    
+    def send_status(status, message, progress=0):
+        if not WEBHOOK_URL:
+            return
+        
+        data = {
+            'token': BUILD_TOKEN,
+            'status': status,
+            'message': message,
+            'progress': progress
+        }
+        
+        try:
+            response = requests.post(WEBHOOK_URL, json=data, timeout=5)
+            print(f"Webhook sent: {response.status_code}")
+        except Exception as e:
+            print(f"Webhook error: {e}")
+    
+    if __name__ == "__main__":
+        if len(sys.argv) > 2:
+            send_status(sys.argv[1], sys.argv[2], int(sys.argv[3]) if len(sys.argv) > 3 else 0)
+    EOF
+  
+  - chmod +x /usr/local/bin/winbuilder-webhook.py
+  
+  # Create monitoring script
+  - |
+    cat > /usr/local/bin/monitor-build.sh << 'EOF'
+    #!/bin/bash
+    # Monitor Windows build progress
+    
+    LOG_FILE="/var/log/winbuilder/build.log"
+    STATUS_FILE="/root/winbuild/status"
+    
+    while true; do
+        if [ -f "$LOG_FILE" ]; then
+            # Check for specific progress markers
+            if grep -q "Downloading Windows ISO" "$LOG_FILE"; then
+                echo "DOWNLOADING_ISO" > "$STATUS_FILE"
+                /usr/local/bin/winbuilder-webhook.py "building" "Downloading Windows ISO" 20
+            elif grep -q "Creating disk image" "$LOG_FILE"; then
+                echo "CREATING_DISK" > "$STATUS_FILE"
+                /usr/local/bin/winbuilder-webhook.py "building" "Creating disk image" 40
+            elif grep -q "Installing Windows" "$LOG_FILE"; then
+                echo "INSTALLING" > "$STATUS_FILE"
+                /usr/local/bin/winbuilder-webhook.py "building" "Installing Windows" 60
+            elif grep -q "Windows VM started successfully" "$LOG_FILE"; then
+                echo "COMPLETE" > "$STATUS_FILE"
+                /usr/local/bin/winbuilder-webhook.py "complete" "Windows ready for RDP" 100
+                break
+            elif grep -q "ERROR" "$LOG_FILE"; then
+                echo "ERROR" > "$STATUS_FILE"
+                ERROR_MSG=$(grep "ERROR" "$LOG_FILE" | tail -1)
+                /usr/local/bin/winbuilder-webhook.py "error" "$ERROR_MSG" 0
+                break
+            fi
+        fi
+        sleep 10
+    done
+    EOF
+  
+  - chmod +x /usr/local/bin/monitor-build.sh
+  
+  # Create systemd service for monitoring
+  - |
+    cat > /etc/systemd/system/winbuilder-monitor.service << 'EOF'
+    [Unit]
+    Description=Windows Builder Monitor
+    After=network.target
+    
+    [Service]
+    Type=simple
+    ExecStart=/usr/local/bin/monitor-build.sh
+    Restart=on-failure
+    RestartSec=10
+    StandardOutput=journal
+    StandardError=journal
+    
+    [Install]
+    WantedBy=multi-user.target
+    EOF
+  
+  - systemctl daemon-reload
+  - systemctl enable winbuilder-monitor.service
+  
+  # Log initialization complete
+  - echo "Cloud-init completed at $(date)" >> /var/log/winbuilder/init.log
+  - /usr/local/bin/winbuilder-webhook.py "ready" "Droplet initialized and ready" 10
+
+# Configure SSH (optional - if you want to add specific SSH keys)
+ssh_authorized_keys:
+  - "{{ ssh_public_key }}"
+
+# Set hostname
+hostname: winbuilder-{{ droplet_name }}
+
+# Final message
+final_message: "Windows Builder droplet is ready for builds!"

@@ -1,0 +1,15 @@
+@import './base.css';
+
+/* Reset default Vue styles */
+#app {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  font-weight: normal;
+}
+
+/* Keep some useful link styles */
+a {
+  text-decoration: none;
+  transition: 0.4s;
+}

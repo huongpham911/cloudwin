@@ -1,0 +1,70 @@
+# WinCloud Builder - Cursor AI Rules
+
+## Project Context
+- **Tên dự án**: WinCloud Builder
+- **Vai trò**: Senior Developer
+- **Ngôn ngữ**: Tiếng Việt với Project Manager
+- **Mục tiêu**: Dashboard tự động hóa Windows RDP trên DigitalOcean
+
+## Development Rules
+
+### 1. API Integration
+- Sử dụng 100% DigitalOcean API
+- Reference: https://docs.digitalocean.com/reference/pydo/
+- Service file: `backend/app/services/digitalocean_service.py`
+
+### 2. VPS Types
+**Linux VPS**: Dùng hoàn toàn DO API, không custom
+**Windows VPS**: Custom ISO + DO infrastructure (regions, sizes)
+
+### 3. Testing Rules
+- ALL test files → `Test-data/` directory
+- MUST cleanup after testing
+- Use `Test-data/scripts/cleanup_all.py`
+- NO test files in Git commits
+
+### 4. Code Patterns
+- Backend: FastAPI + SQLAlchemy + PostgreSQL
+- Frontend: React + TypeScript + Tailwind + React Query
+- Enable routes gradually in `api.py`
+- Use Pydantic schemas for validation
+
+### 5. File Structure
+```
+backend/app/
+├── api/v1/          # API routes (most commented out)
+├── services/        # Business logic
+├── models/          # SQLAlchemy models
+├── schemas/         # Pydantic schemas
+└── core/           # Config, database, security
+
+Test-data/
+├── api_tests/      # API integration tests
+├── linux_tests/    # Linux VPS tests
+├── windows_tests/  # Windows VPS tests
+└── scripts/        # Cleanup utilities
+```
+
+### 6. Startup Commands
+- Full stack: `START_WINCLOUD.bat`
+- Backend only: `cd backend && python run_minimal_real_api.py`
+- Frontend only: `cd frontend && npm run dev`
+
+### 7. Never Do
+- Commit test files
+- Leave test droplets running
+- Hard-code credentials
+- Skip cleanup after testing
+
+### 8. Always Do
+- Use Test-data/ for all tests
+- Cleanup with scripts after testing
+- Communicate in Vietnamese
+- Follow DigitalOcean API patterns
+- Enable API routes incrementally
+
+## Key Files
+- `rules.md` - Complete project rules
+- `backend/tokens.json` - DO API tokens
+- `Test-data/scripts/cleanup_all.py` - Mandatory cleanup
+- `.github/copilot-instructions.md` - AI guidance
