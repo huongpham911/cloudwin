@@ -329,7 +329,7 @@ else
     print_status "Development deployment successful!"
     echo
     print_info "🌐 Frontend: http://localhost:5173"
-    print_info "🏠 Home Page: http://localhost:7001"
+    print_info "🏠 Home Page: http://localhost:7000"
     print_info "🔧 Backend API: http://localhost:5000"
     print_info "📚 API Docs: http://localhost:5000/docs"
     print_info "💾 Database: localhost:5433"
