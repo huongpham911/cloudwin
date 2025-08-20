@@ -75,8 +75,11 @@ user_tokens.json
 */user_tokens.json
 keys.txt
 */keys.txt
-spaces_credentials.json
-*/spaces_credentials.json
+spaces_credentials.json*
+*/spaces_credentials.json*
+*credentials*.json
+*tokens*.json
+*.backup
 *.key
 master.key
 encryption.key
