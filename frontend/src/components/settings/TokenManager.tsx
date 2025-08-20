@@ -35,11 +35,22 @@ const TokenManager: React.FC<TokenManagerProps> = ({ onTokensChange }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [isSyncing, setIsSyncing] = useState(false)
   const [message, setMessage] = useState('')
+  const [spacesStatus, setSpacesStatus] = useState<any>(null)
 
   // Load user tokens from backend on component mount
   useEffect(() => {
     loadUserTokens()
+    loadSpacesStatus()
   }, [])
+
+  const loadSpacesStatus = async () => {
+    try {
+      const response = await api.get('/api/v1/spaces/credentials/status')
+      setSpacesStatus(response.data)
+    } catch (error) {
+      console.error('Failed to load Spaces status:', error)
+    }
+  }
 
   // Update token service when tokens change
   useEffect(() => {
@@ -148,6 +159,27 @@ const TokenManager: React.FC<TokenManagerProps> = ({ onTokensChange }) => {
 
       if (response.status === 200) {
         setMessage(`✅ Token "${newTokenName}" added successfully!`)
+
+        // Auto-setup Spaces credentials
+        try {
+          setMessage('🔄 Auto-setting up Spaces credentials...')
+          const spacesResponse = await api.post('/api/v1/spaces/auto-setup', {
+            token: newToken.trim()
+          })
+
+          if (spacesResponse.data?.success) {
+            setMessage(`✅ Token "${newTokenName}" added and Spaces credentials auto-configured!`)
+            // Reload Spaces status
+            await loadSpacesStatus()
+          } else {
+            setMessage(`✅ Token "${newTokenName}" added, but Spaces auto-setup failed. You can configure manually.`)
+            console.warn('Spaces auto-setup failed:', spacesResponse.data?.error)
+          }
+        } catch (spacesError) {
+          console.warn('Spaces auto-setup error:', spacesError)
+          setMessage(`✅ Token "${newTokenName}" added, but Spaces auto-setup failed. You can configure manually.`)
+        }
+
         setNewToken('')
         setNewTokenName('')
         // Reload tokens
@@ -252,9 +284,18 @@ const TokenManager: React.FC<TokenManagerProps> = ({ onTokensChange }) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-          Quản lý DigitalOcean Tokens
-        </h3>
+        <div>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+            Quản lý DigitalOcean Tokens
+          </h3>
+          {/* Spaces Status */}
+          {spacesStatus && (
+            <div className={`mt-2 inline-flex items-center px-2 py-1 rounded-md text-xs ${spacesStatus.configured ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+              <div className={`w-2 h-2 rounded-full mr-2 ${spacesStatus.configured ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
+              Spaces: {spacesStatus.configured ? 'Configured' : 'Not Configured'}
+            </div>
+          )}
+        </div>
         <button
           onClick={loadUserTokens}
           disabled={isLoading}

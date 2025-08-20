@@ -79,7 +79,10 @@ try:
     
     # Import SpacesService factory function
     from app.services.spaces import get_spaces_service
-    
+
+    # Import Auto Spaces service
+    from app.services.auto_spaces_service import auto_spaces_service
+
     # Import GenAI service
     from app.services.genai_service import get_genai_service
     from app.services.direct_genai_service import get_direct_genai_service
@@ -2512,20 +2515,49 @@ try:
                 "note": "Make sure you have created Spaces access keys first"
             }
 
+    @app.post("/api/v1/spaces/auto-setup")
+    async def auto_setup_spaces_credentials(token_data: dict):
+        """Auto-setup Spaces credentials from DigitalOcean token"""
+        try:
+            do_token = token_data.get("token")
+            if not do_token:
+                return {"error": "DigitalOcean token is required"}
+
+            # Auto-load and setup Spaces credentials
+            result = await auto_spaces_service.auto_setup_spaces_for_token(do_token)
+
+            if result['success']:
+                # Reinitialize spaces service with new credentials
+                global spaces_service
+                creds = result['credentials']
+                spaces_service = get_spaces_service(
+                    token=do_token,
+                    spaces_key=creds['access_key'],
+                    spaces_secret=creds['secret_key']
+                )
+                logger.info("✅ Spaces service reinitialized with auto-loaded credentials")
+
+            return result
+
+        except Exception as e:
+            logger.error(f"❌ Auto-setup error: {e}")
+            return {"error": f"Auto-setup failed: {str(e)}"}
+
     @app.post("/api/v1/spaces/credentials")
     async def set_spaces_credentials(credentials: dict):
-        """Set Spaces credentials for bucket operations"""
+        """Set Spaces credentials for bucket operations (manual)"""
         try:
             access_key = credentials.get("access_key")
             secret_key = credentials.get("secret_key")
             region = credentials.get("region", "nyc3")
-            
+
             if not access_key or not secret_key:
                 return {"error": "Both access_key and secret_key are required"}
-            
+
             # Set credentials in spaces service
-            await spaces_service.set_spaces_credentials(access_key, secret_key, region)
-            
+            if spaces_service:
+                await spaces_service.set_spaces_credentials(access_key, secret_key, region)
+
             # Save credentials to file for persistence
             credentials_data = {
                 "access_key": access_key,
