@@ -52,6 +52,9 @@ services:
       # Database
       DATABASE_URL: postgresql://wincloud:wincloud_dev@db:5432/wincloud_dev
 
+      # Database initialization
+      POSTGRES_DB: wincloud_dev
+
       # Redis
       REDIS_URL: redis://:wincloud_dev_redis@redis:6379/0
 

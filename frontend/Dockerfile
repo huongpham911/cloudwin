@@ -40,6 +40,15 @@ ENV GENERATE_SOURCEMAP=false
 # Build the application
 RUN npm run build
 
+# Install serve for development
+RUN npm install -g serve
+
+# Development stage
+FROM build as development
+WORKDIR /app
+EXPOSE 5173
+CMD ["npm", "run", "dev"]
+
 # Production stage with Nginx
 FROM nginx:alpine as production
 
