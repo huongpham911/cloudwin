@@ -9247,7 +9247,7 @@ try:
         # Configure Uvicorn with unlimited limits for CDN file uploads
         uvicorn_config = uvicorn.Config(
             app,
-            host="127.0.0.1",
+            host="0.0.0.0",
             port=5000,
             log_level="info",
             limit_max_requests=1000,

@@ -24,7 +24,7 @@ COPY . .
 EXPOSE 5000
 
 # Run the application in development mode
-CMD ["uvicorn", "app.main:app", "--host", "127.0.0.1", "--port", "5000", "--reload"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]
 
 # Production stage
 FROM python:3.11-slim as production

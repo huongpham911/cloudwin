@@ -15,7 +15,7 @@ export default defineConfig({
     }
   },
   server: {
-    host: '127.0.0.1', // Secure local connections only
+    host: '0.0.0.0', // Allow external connections for Docker
     port: 5173,
     // Remove proxy - using separate api.wincloud.app domain
     // proxy: {
